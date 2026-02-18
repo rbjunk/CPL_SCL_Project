@@ -1,0 +1,25 @@
+import "scl.h"
+
+/* Comment Block */ set x = 5
+/* Comment set y = 6
+set z = 7
+set a = 8   Block */
+symbol PI M_PI
+
+set x = 10
+implementations
+
+function main is
+variables 
+    define r of type double //radius of circle
+    define area of type double
+    define circumference of type double //circumference of circle
+begin
+    input "Enter value of radius: ", r
+    display "Value of radius: ", r
+    set area = PI * r^2
+    set cir = 2.0 * PI * r
+    display "Value of area: ", area
+    display "Value of circumference: ", cir
+    exit //execution terminates
+endfun main
