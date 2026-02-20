@@ -31,7 +31,7 @@ namespace CPL_SCL_Project
             regex = new Regex("^" + pattern);
         }
     }
-    class TokenTypes
+    class TokenTypes //nested dictionary that includes all possible keywords, and other supported characters
     {
         public static Dictionary<token_types, Dictionary<string, int>> TokenList = new Dictionary<token_types, Dictionary<string, int>>()
         {
