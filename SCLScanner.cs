@@ -1,4 +1,7 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 namespace CPL_SCL_Project
 {
@@ -7,8 +10,10 @@ namespace CPL_SCL_Project
         static void Main(string[] args)
         {
             string file_location = args[0];
-            Console.WriteLine("TEST");
-            tokenize(file_location);
+            List<Token> token_list = tokenize(file_location);
+            string jsonstring = JsonSerializer.Serialize(token_list, new JsonSerializerOptions {WriteIndented = true, Converters = {new JsonStringEnumConverter() }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
+            File.WriteAllText(file_location + "_tokenized.json", jsonstring);
+            Console.WriteLine("Successfully saved tokens to " + file_location + "_tokenized.json");
         }
         public static List<Token> tokenize(string file_location)
         {
@@ -39,24 +44,25 @@ namespace CPL_SCL_Project
                     {
                         remaining_line_text = reader.ReadLine();
                         remaining_line_text = remaining_line_text.Trim();
-                        if (in_comment_block )
+                        if (string.IsNullOrEmpty(remaining_line_text)) continue;
+                        if (in_comment_block)
                         {
                             // Check if this line closes the block
                             int closeIndex = remaining_line_text.IndexOf("*/");
-
                             if (closeIndex != -1)
                             {
                                 // Found the closing "*/"
                                 // Resume tokenizing AFTER the "*/" (add 2 for the length of */)
                                 remaining_line_text = remaining_line_text.Substring(closeIndex + 2).TrimStart();
                                 in_comment_block = false;
+                                // If the line is empty after the comment ends, don't try to tokenize
+                                if (string.IsNullOrEmpty(remaining_line_text)) continue;
                             }
-                            else
-                            {
-                                continue;
-                            }
+                            else continue;
                         }
-                    
+                        // Flag to see if we actually generated real tokens on this line
+                        bool lineHadTokens = false;
+
                         while (!string.IsNullOrEmpty(remaining_line_text))
                         {
                             bool match_found = false;
@@ -65,6 +71,10 @@ namespace CPL_SCL_Project
                                 var match = pattern.regex.Match(remaining_line_text);
                                 if(match.Success)
                                 {
+                                    if (pattern.type != token_types.comment && pattern.type != token_types.commentStart)
+                                    {
+                                        lineHadTokens = true;
+                                    }
                                     if (pattern.type == token_types.comment)
                                     {
                                     }
@@ -78,6 +88,7 @@ namespace CPL_SCL_Project
                                         if (TokenTypes.TokenList.TryGetValue(pattern.type, out var dict) &&
                                             dict.TryGetValue(match.Value, out int code))
                                         {
+                                            all_tokens.Add(new Token(pattern.type, code, match.Value));
                                             Console.WriteLine($"Token created: {pattern.type} id:{code} value:{match.Value}");
                                         }
                                     }
@@ -86,6 +97,7 @@ namespace CPL_SCL_Project
                                         if (TokenTypes.TokenList.TryGetValue(pattern.type, out var dict) &&
                                             dict.TryGetValue(match.Value, out int code))
                                         {
+                                            all_tokens.Add(new Token(pattern.type, code, match.Value));
                                             Console.WriteLine($"Token created: {pattern.type} id:{code} value:{match.Value}");
                                         }
                                     }
@@ -94,11 +106,13 @@ namespace CPL_SCL_Project
                                         if (current_identifiers.ContainsKey(match.Value))
                                         {
                                             int identifier_value = current_identifiers[match.Value];
+                                            all_tokens.Add(new Token(pattern.type, identifier_value, match.Value));
                                             Console.WriteLine($"Token created: {pattern.type} id:{identifier_value} value:{match.Value}");
                                         }
                                         else
                                         {
                                             int identifier_value = current_identifier_id;
+                                            all_tokens.Add(new Token(pattern.type, identifier_value, match.Value));
                                             Console.WriteLine($"Token created: {pattern.type} id:{identifier_value} value:{match.Value}");
                                             current_identifiers.Add(match.Value, identifier_value);
                                             current_identifier_id++;
@@ -109,13 +123,20 @@ namespace CPL_SCL_Project
                                         if (TokenTypes.TokenList.TryGetValue(pattern.type, out var dict) &&
                                             dict.TryGetValue(match.Value, out int code))
                                         {
+                                            all_tokens.Add(new Token(pattern.type, code, match.Value));
                                             Console.WriteLine($"Token created: {pattern.type} id:{code} value:{match.Value}");
                                         }
                                     }
                                     else if (pattern.type == token_types.literal)
                                     {
-
-                                            Console.WriteLine($"Token created: {pattern.type} id:{600} value:{match.Value}");
+                                        string cleanValue = match.Value;
+                                        // If the value starts and ends with a quote, strip them
+                                        if (cleanValue.StartsWith("\"") && cleanValue.EndsWith("\""))
+                                        {
+                                            cleanValue = cleanValue.Substring(1, cleanValue.Length - 2);
+                                        }
+                                        all_tokens.Add(new Token(pattern.type, 500, cleanValue));
+                                        Console.WriteLine($"Token created: {pattern.type} id:{500} value:{match.Value}");
                                     }
 
                                     if (!in_comment_block)
@@ -128,11 +149,16 @@ namespace CPL_SCL_Project
                             }
                             if (!match_found)
                             {
-                                Console.WriteLine(token_types.unknown + " " + remaining_line_text[0].ToString());
+                                all_tokens.Add(new Token(token_types.unknown, 700, remaining_line_text[0].ToString()));
+                                Console.WriteLine($"Token created: {token_types.unknown} id:{700} value:{remaining_line_text[0].ToString()}");
                                 remaining_line_text = remaining_line_text.Substring(1).TrimStart();
                             }
                         }
-
+                        if (lineHadTokens)
+                        {
+                            all_tokens.Add(new Token(token_types.endOfStatement, 600, "EOS"));
+                            Console.WriteLine($"Token created: {token_types.endOfStatement} id:{600} value:{"EOS"}");
+                        }
                     }
                 }
             }

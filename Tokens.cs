@@ -106,6 +106,14 @@ namespace CPL_SCL_Project
             },
 
             {
+                token_types.endOfStatement, new Dictionary<string, int>()
+                {
+                    { "endOfStatement", 600 }
+                }
+
+            },
+
+            {
                 token_types.specialSymbols, new Dictionary<string, int>()
                 {
                     { ",", 800 },
