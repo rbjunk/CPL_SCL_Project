@@ -15,6 +15,8 @@ namespace CPL_SCL_Project
             string jsonstring = JsonSerializer.Serialize(token_list, new JsonSerializerOptions {WriteIndented = true, Converters = {new JsonStringEnumConverter() }, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping });
             File.WriteAllText(file_location + "_tokenized.json", jsonstring);
             Console.WriteLine("Successfully saved tokens to " + file_location + "_tokenized.json");
+            Parser parser = new Parser(token_list);
+            parser.begin();
         }
         public static List<Token> tokenize(string file_location)
         {

@@ -123,7 +123,7 @@ namespace CPL_SCL_Project
         };
     }
 
-    class Token
+    public class Token
     {
         public token_types token_type { get; set; }
         public int id { get; set; }
