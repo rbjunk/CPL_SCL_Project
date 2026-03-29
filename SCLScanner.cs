@@ -36,7 +36,7 @@ namespace CPL_SCL_Project
                         new TokenDefinition(token_types.commentStart, @"/\*.*"), //multiline comment
                         new TokenDefinition(token_types.literal, @"""[^""]*"""), //string literal
                         new TokenDefinition(token_types.operators, @"[+\-*/^><=()]"), //operator check
-                        new TokenDefinition(token_types.keyword, @"\b(import|implementations|function|main|return|type|integer|double|char|num|is|variables|define|of|begin|display|set|exit|endfun|symbol|end|input|structures|pointer|head|last|NULL|ChNode|using|reverse|while|endwhile|call|constants|float|array|for|to|do|endfor)\b"), //keyword check
+                        new TokenDefinition(token_types.keyword, @"\b(import|function|return|type|integer|double|char|is|variables|define|of|begin|display|set|endfun|NULL|while|endwhile|call|constants|array|for|to|do|endfor)\b"), //keyword check
                         new TokenDefinition(token_types.literal, @"\d+\.\d+"), //double check
                         new TokenDefinition(token_types.literal, @"\d+"), //integer check
                         new TokenDefinition(token_types.specialSymbols, @"[,\.]"), //special character check
