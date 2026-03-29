@@ -113,9 +113,15 @@ namespace CPL_SCL_Project
             {
                 functionStatement(parent); //send the parent node so child nodes can be linked back.
             }
+            // Check if the statement starts with the "return" keyword
             else if (matchKeyword("return"))
             {
                 returnStatement(parent);
+            }
+            // Check if the statement starts with the "display" keyword
+            else if (matchKeyword("display"))
+            {
+                displayStatement(parent);
             }
             else
             {
@@ -298,6 +304,34 @@ namespace CPL_SCL_Project
 
             Console.WriteLine("Parsed: Return Statement");
         }
+
+        private void displayStatement(Tree_Node parent)
+        {
+            // Consume the 'display' keyword
+            consumeKeyword("display");
+
+            // Create the tree node for this statement and attach it to the parent
+            Tree_Node displayNode = new Tree_Node("displayStatement", null);
+            parent.addChild(displayNode);
+
+            // Parse the first argument. Leveraging expression() natively handles 
+            // identifiers, literals, and even mathematical expressions.
+            displayNode.addChild(expression(displayNode));
+
+            // Loop to handle infinite chaining separated by commas
+            while (checkSpecial(","))
+            {
+                consumeSpecial(","); // Consume the comma separator
+
+                // Parse the next chained argument and attach it to the display node
+                displayNode.addChild(expression(displayNode));
+            }
+
+            // Consume the end of statement (newline)
+            consumeEOS();
+
+            Console.WriteLine("Parsed: Display Statement");
+        }
         // --- EXPRESSION PARSING METHODS ---
 
         private Tree_Node expression(Tree_Node parent)
@@ -466,6 +500,11 @@ namespace CPL_SCL_Project
         {
             return _currentToken != null && _currentToken.token_type == token_types.operators && _currentToken.value == op;
         }
+        //Checks the current special symbol without consuming it.
+        private bool checkSpecial(string op)
+        {
+            return _currentToken != null && _currentToken.token_type == token_types.specialSymbols && _currentToken.value == op;
+        }
         private void consumeOperator(string op)
         {
             if (_currentToken != null && _currentToken.token_type == token_types.operators && _currentToken.value == op)
@@ -473,6 +512,14 @@ namespace CPL_SCL_Project
                 getNextToken();
             }
             else { throw new Exception($"Expected operator '{op}' but found '{_currentToken?.value}'"); }
+        }
+        private void consumeSpecial(string op)
+        {
+            if (_currentToken != null && _currentToken.token_type == token_types.specialSymbols && _currentToken.value == op)
+            {
+                getNextToken();
+            }
+            else { throw new Exception($"Expected special symbol '{op}' but found '{_currentToken?.value}'"); }
         }
 
         private void consumeEOS()

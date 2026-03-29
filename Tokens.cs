@@ -38,31 +38,21 @@ namespace CPL_SCL_Project
             {
                 token_types.keyword, new Dictionary<string, int>()
                 {
-                    { "import", 0 }, //
-                    { "function", 2 }, //
-                    { "return", 4 }, //
-                    { "type", 5 }, //
-                    { "integer", 6 }, //
-                    { "double", 7 }, //
-                    { "char", 8 }, //
-                    { "is", 10 }, //
-                    { "variables", 11 }, //
-                    { "define", 12 }, //
-                    { "of", 13 }, //
-                    { "begin", 14 }, //
-                    { "display", 15 },
-                    { "set", 16 },
-                    { "endfun", 18 },
-                    { "NULL", 26 },
-                    { "while", 30 },
-                    { "endwhile", 31 },
-                    { "call", 32 },
-                    { "constants", 33 },
-                    { "array", 35 },
-                    { "for", 36 },
-                    { "to", 37 },
-                    { "do", 38 },
-                    { "endfor", 39 },
+                    { "import", 0 }, 
+                    { "function", 2 }, 
+                    { "return", 4 }, 
+                    { "type", 5 }, 
+                    { "integer", 6 }, 
+                    { "double", 7 }, 
+                    { "char", 8 }, 
+                    { "is", 10 }, 
+                    { "variables", 11 }, 
+                    { "define", 12 }, 
+                    { "of", 13 }, 
+                    { "begin", 14 }, 
+                    { "display", 15 }, 
+                    { "set", 16 }, 
+                    { "endfun", 18 }, 
                 }
             },
 
